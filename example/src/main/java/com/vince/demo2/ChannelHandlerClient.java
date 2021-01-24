@@ -1,4 +1,4 @@
-package com.vince.demo1;
+package com.vince.demo2;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.Unpooled;
@@ -25,10 +25,10 @@ import java.net.URI;
  * @author vince
  * @since v1.0.0
  */
-public class HttpClient {
+public class ChannelHandlerClient {
     public static void main(String[] args) throws Exception {
-        HttpClient client = new HttpClient();
-        client.connect("127.0.0.1", 8888);
+        ChannelHandlerClient client = new ChannelHandlerClient();
+        client.connect("127.0.0.1", 8088);
     }
 
     private void connect(String host, int port) throws Exception {
@@ -53,7 +53,7 @@ public class HttpClient {
                 protected void initChannel(SocketChannel ch) {
                     ch.pipeline().addLast(new HttpResponseDecoder());
                     ch.pipeline().addLast(new HttpRequestEncoder());
-                    ch.pipeline().addLast(new HttpClientHandler());
+                    ch.pipeline().addLast(new ClientChannelHandler());
                 }
             });
 

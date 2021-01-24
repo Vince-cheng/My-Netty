@@ -454,6 +454,7 @@ public final class NioEventLoop extends SingleThreadEventLoop {
                         // fall-through to SELECT since the busy-wait is not supported with NIO
 
                     case SelectStrategy.SELECT:
+                        // 轮询 I/O 事件
                         select(wakenUp.getAndSet(false));
 
                         // 'wakenUp.compareAndSet(false, true)' is always evaluated
@@ -503,18 +504,24 @@ public final class NioEventLoop extends SingleThreadEventLoop {
                 final int ioRatio = this.ioRatio;
                 if (ioRatio == 100) {
                     try {
+                        // 处理 I/O 事件
                         processSelectedKeys();
                     } finally {
                         // Ensure we always run tasks.
+
+                        // 处理所有任务
                         runAllTasks();
                     }
                 } else {
                     final long ioStartTime = System.nanoTime();
                     try {
+                        // 处理 I/O 事件
                         processSelectedKeys();
                     } finally {
                         // Ensure we always run tasks.
                         final long ioTime = System.nanoTime() - ioStartTime;
+
+                        // 处理完 I/O 事件，再处理异步任务队列
                         runAllTasks(ioTime * (100 - ioRatio) / ioRatio);
                     }
                 }
