@@ -147,6 +147,7 @@ public final class ChannelOutboundBuffer {
                 if (!entry.promise.setUncancellable()) {
                     // Was cancelled so make sure we free up memory and notify about the freed bytes
                     int pending = entry.cancel();
+                    // 减去待发送的数据，如果总字节数低于低水位，那么 Channel 将变为可写状态
                     decrementPendingOutboundBytes(pending, false, true);
                 }
                 entry = entry.next;
@@ -171,6 +172,8 @@ public final class ChannelOutboundBuffer {
         }
 
         long newWriteBufferSize = TOTAL_PENDING_SIZE_UPDATER.addAndGet(this, size);
+
+        // 判断缓存大小是否超过高水位线
         if (newWriteBufferSize > channel.config().getWriteBufferHighWaterMark()) {
             setUnwritable(invokeLater);
         }

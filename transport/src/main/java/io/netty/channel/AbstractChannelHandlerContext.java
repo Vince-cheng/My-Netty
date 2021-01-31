@@ -780,12 +780,16 @@ abstract class AbstractChannelHandlerContext implements ChannelHandlerContext, R
             throw e;
         }
 
+        // 找到 Pipeline 链表中下一个 Outbound 类型的 ChannelHandler 节点
         final AbstractChannelHandlerContext next = findContextOutbound(flush ?
                 (MASK_WRITE | MASK_FLUSH) : MASK_WRITE);
         final Object m = pipeline.touch(msg, next);
         EventExecutor executor = next.executor();
+
+        // 判断当前线程是否是 NioEventLoop 中的线程
         if (executor.inEventLoop()) {
             if (flush) {
+                // 因为 flush == true，所以流程走到这里
                 next.invokeWriteAndFlush(m, promise);
             } else {
                 next.invokeWrite(m, promise);
